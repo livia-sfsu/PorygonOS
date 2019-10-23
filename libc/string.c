@@ -61,9 +61,14 @@ void append(char s[], char n) {
     s[len+1] = '\0';
 }
 
-void backspace(char s[]) {
+int backspace(char s[]) {
     int len = strlen(s);
-    s[len-1] = '\0';
+
+    if (len > 0) {
+        s[len-1] = '\0';
+    }
+
+    return len;
 }
 
 /* K&R 
