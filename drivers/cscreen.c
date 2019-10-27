@@ -150,13 +150,13 @@ void __printc(char chr, int format) {
 
     if (newOffset > maxOffset) {
         int i;
-        int currOffset, prevOffset;
+        uint32_t currOffset, prevOffset;
 
         // Copy over the bytes from each row to the one above
         for (i = 1; i < SCREEN_HEIGHT; i++) {
-            currOffset = vidMem + i * SCREEN_WIDTH * 2;
-            prevOffset = vidMem + (i - 1) * SCREEN_WIDTH * 2;
-            memory_copy(currOffset, prevOffset, SCREEN_WIDTH * 2);
+            currOffset = (uint32_t) vidMem + i * SCREEN_WIDTH * 2;
+            prevOffset = (uint32_t) vidMem + (i - 1) * SCREEN_WIDTH * 2;
+            memory_copy((char*) currOffset, (char*) prevOffset, SCREEN_WIDTH * 2);
         }
 
         // Erase the last row
