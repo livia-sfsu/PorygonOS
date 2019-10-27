@@ -1,9 +1,11 @@
 #ifndef PORTS_H
 #include "../cpu/ports.h"
 #endif
+#ifndef MEM_H
+#include "../libc/mem.h"
+#endif
 
 #include "cscreen.h"
-
 
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 25
@@ -130,46 +132,46 @@ void __printc(char chr, int format) {
     char *vidMem = (char*) VIDEO_MEMORY;
     int offset = _getcpos();
     int maxOffset = SCREEN_HEIGHT * SCREEN_WIDTH * 2;
-    int newLineNeeded = 0;
+    int newOffset;
+    int lineLength = SCREEN_WIDTH * 2;
 
-    int finalRow = SCREEN_HEIGHT - 1;
-    if (chr == '\n' && _getrowpos() >= finalRow)
-        newLineNeeded = 1;
-    else if (offset + 2 > maxOffset)
-        newLineNeeded = 1;
+    // Right, here's what we do:
+    // 1) Work out the new offset
+    // 2) Work out if we need to scroll a line
 
-    int newchrpos, prevchrpos;
-
-    // Check to see if we need to scroll
-    if (newLineNeeded) {
-        // We need to scroll, so let's shift the contents up by 1
-        int i, j;
-        for (i = 0; i < SCREEN_HEIGHT - 1; i++) {
-            for (j = 0; j < SCREEN_WIDTH; j++) {
-                // Copy text, then format
-                newchrpos = (i * (SCREEN_WIDTH * 2) + j * 2);
-                prevchrpos = ((i + 1) * (SCREEN_WIDTH * 2) + j * 2);                
-
-                vidMem[newchrpos] = vidMem[prevchrpos];
-                vidMem[newchrpos + 1] = vidMem[prevchrpos + 1];
-            }
-        }
-
-        // Now, we need to make sure that the final line is clear of text
-        for (i = 0; i < SCREEN_WIDTH; i++) {
-            vidMem[(SCREEN_HEIGHT - 1) * SCREEN_WIDTH + (i * 2)] = ' ';
-            vidMem[(SCREEN_HEIGHT - 1) * SCREEN_WIDTH + (i * 2) + 1] = STD_TEXT;
-        }
-
-        // Finally, move the cursor to the new position
-        _setcpos((SCREEN_HEIGHT - 2) * SCREEN_WIDTH * 2);
+    if (chr == '\n') {
+        int multiples = offset / lineLength + 1;
+        newOffset = (multiples) * lineLength;
+    } else {
+        newOffset = offset + 2;
     }
 
-    if (chr == '\n' && !newLineNeeded) {
-        int noLines = offset / (SCREEN_WIDTH * 2);
-        int newOffset = (noLines + 1) * (SCREEN_WIDTH * 2);
+    // At this point, we need to scroll the screen
+
+    if (newOffset > maxOffset) {
+        int i;
+        int currOffset, prevOffset;
+
+        // Copy over the bytes from each row to the one above
+        for (i = 1; i < SCREEN_HEIGHT; i++) {
+            currOffset = vidMem + i * SCREEN_WIDTH * 2;
+            prevOffset = vidMem + (i - 1) * SCREEN_WIDTH * 2;
+            memory_copy(currOffset, prevOffset, SCREEN_WIDTH * 2);
+        }
+
+        // Erase the last row
+        currOffset = (SCREEN_HEIGHT - 1) * SCREEN_WIDTH * 2;
+        for (i = currOffset; i < maxOffset; i++)
+            vidMem[i] = 0;
+
+        _setcpos(currOffset);
+        offset = currOffset;
+    } else if (chr == '\n') {
         _setcpos(newOffset);
-    } else {
+    }
+
+    // Finally, put the character into place
+    if (chr != '\n') {
         vidMem[offset] = chr;
         vidMem[offset + 1] = format;
         _setcpos(offset + 2);
