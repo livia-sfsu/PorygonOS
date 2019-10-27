@@ -1,7 +1,7 @@
 #include "keyboard.h"
 #include "../cpu/ports.h"
 #include "../cpu/isr.h"
-#include "screen.h"
+#include "cscreen.h"
 #include "../libc/string.h"
 #include "../libc/function.h"
 #include "../kernel/kernel.h"
@@ -33,9 +33,9 @@ static void keyboard_callback(registers_t *regs) {
     if (scancode == BACKSPACE) {
         int len = backspace(key_buffer);
         if (len > 0)
-            kprint_backspace();
+            _printbks();
     } else if (scancode == ENTER) {
-        kprint("\n");
+        _prints("\n");
         user_input(key_buffer); /* kernel-controlled function */
         key_buffer[0] = '\0';
     } else {
@@ -43,7 +43,7 @@ static void keyboard_callback(registers_t *regs) {
         /* Remember that kprint only accepts char[] */
         char str[2] = {letter, '\0'};
         append(key_buffer, letter);
-        kprint(str);
+        _prints(str);
     }
     UNUSED(regs);
 }
