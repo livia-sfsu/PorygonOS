@@ -25,7 +25,7 @@ void _cscreen() {
     int i = 0;
 
     for (i; i < sSize; i++) {
-        vidMem[i * 2] = ' ';
+        vidMem[i * 2] = 0;
         vidMem[i * 2 + 1] = STD_TEXT;
     }
     
@@ -66,8 +66,8 @@ void _printbks() {
     offset -= 2;
 
     char *vidMem = (char*) VIDEO_MEMORY;
-    vidMem[offset] = ' ';
-    vidMem[offset] = STD_TEXT;
+    vidMem[offset] = 0;
+    vidMem[offset + 1] = STD_TEXT;
 
     _setcpos(offset);
 }
