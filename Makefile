@@ -27,6 +27,15 @@ kernel.elf: boot/kernel_entry.o ${OBJ}
 run: os-image.bin
 	qemu-system-i386 -fda os-image.bin
 
+# pad the binary to 512 bytes
+img: os-image.bin
+	dd if=/dev/zero bs=1024 count=128 of=porygon.img
+	dd if=os-image.bin of=porygon.img conv=notrunc
+	echo "porygon.img created, you may now run bochs"
+	
+bochs: img
+	bochs
+
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin kernel.elf
 	qemu-system-i386 -s -fda os-image.bin &
