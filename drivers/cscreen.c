@@ -65,15 +65,20 @@ void _printbks() {
     int offset = _getcpos();
     offset -= 2;
 
-    char *vidMem = (char*) VIDEO_MEMORY;
-    vidMem[offset] = 0;
-    vidMem[offset + 1] = STD_TEXT;
+    // Check to make sure we don't write outside of memory
+    if (offset >= 0) {
+        char *vidMem = (char*) VIDEO_MEMORY;
+        vidMem[offset] = 0;
+        vidMem[offset + 1] = STD_TEXT;
+    }
 
     _setcpos(offset);
 }
 
 // Turns the flashing cursor on
 void _onc() {
+    // We want to blink pixel lines 14-15 (the lower 2)
+
     // lower cursor shape
     port_byte_out(REG_SCREEN_CTRL, 0x0a);
     // turn it on
