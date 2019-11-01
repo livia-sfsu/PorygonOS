@@ -1,6 +1,6 @@
 #include "../datastructurestuff/cbuf.h"
 #include "../mem/memory.h"
-#include "../kernel/types.h"
+#include "../cpu/types.h"
 
 static inline void increment_head(cbuf_s* buffer){
 	(buffer->head)++;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../kernel/types.h"
+#include "../cpu/types.h"
 
 typedef struct list_node list_node_s;
 typedef struct list list_s;

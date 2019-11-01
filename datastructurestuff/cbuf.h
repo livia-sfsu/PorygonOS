@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../kernel/types.h"
+#include "../cpu/types.h"
 
 /*
  * Defines functions for working with a circular buffer (cbuf) of single byte values.
