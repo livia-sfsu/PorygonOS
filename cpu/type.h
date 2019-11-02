@@ -7,3 +7,19 @@
 #define high_16(address) (uint16_t)(((address) >> 16) & 0xFFFF)
 
 #endif
+
+
+//G: Because I come from Java
+typedef enum{
+	false=0,
+	true=1
+} bool;
+
+//Needed
+//a pointer to a location in memory
+typedef char* memloc_t; 
+
+
+
+
+
