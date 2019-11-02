@@ -17,8 +17,15 @@ os-image.bin: boot/bootsect.bin kernel.bin
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
-kernel.bin: boot/kernel_entry.o ${OBJ}
+kernel.bin: kernel_entry.o paging_util.o ${OBJ}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+
+kernel_entry.o: boot/kernel_entry.asm
+	#compile the kernel entry point but dont link, we need the contents of kernel.c
+	nasm boot/kernel_entry.asm -f elf -o kernel_entry.o
+
+paging_util.o: memory/paging_util.asm
+	nasm memory/paging_util.asm -f elf -o paging_util.o
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
