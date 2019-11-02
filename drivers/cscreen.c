@@ -32,6 +32,25 @@ void _cscreen() {
     _setcpos(0);
 }
 
+// Clears the screen with a custom colour
+void _ccscreen(int format) {
+    char *vidMem = (char*) VIDEO_MEMORY;
+    int sSize = SCREEN_WIDTH * SCREEN_HEIGHT;
+    int i = 0;
+
+    for (i; i < sSize; i++) {
+        vidMem[i * 2] = ' ';
+        vidMem[i * 2 + 1] = format;
+    }
+    
+    _setcpos(0);
+}
+
+// Prints a character to the screen in the specified format
+void _printcc(char chr, int formats) {
+    __printc(chr, formats);
+}
+
 // Prints a character to the screen in standard format
 void _printc(char chr) {
     __printc(chr, STD_TEXT);
@@ -40,6 +59,15 @@ void _printc(char chr) {
 // Prints a character to the screen in standard error format
 void _printec(char chr) {
     __printc(chr, STD_ERR);
+}
+
+// Prints a string to the screen in the specified format
+void _printcs(char *str, int formats) {
+    int i = 0;
+
+    while (str[i]) {
+        __printc(str[i++], formats);
+    }
 }
 
 // Prints a string to the screen in standard format
@@ -93,6 +121,12 @@ void _onc() {
 void _offc() {
     port_byte_out(REG_SCREEN_CTRL, 0x0a);
     port_byte_out(REG_SCREEN_DATA, 0x20);
+}
+
+// Sets the cursor position
+void _setcposx(int x, int y) {
+    int offset = y * SCREEN_WIDTH + x;
+    _setcpos(offset * 2);
 }
 
 // Sets the cursor position, accounting for 2-byte cells
