@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../cpu/types.h"
+#include "../cpu/type.h"
 /**
  * Copy bytes between two memory locations
  */

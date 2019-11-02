@@ -1,4 +1,4 @@
-#include "../memory/memory.h"
+#include "memory.h"
 
 void memcpy(void* vsource, void* vdest, uint32_t num_bytes){
 	int i;
