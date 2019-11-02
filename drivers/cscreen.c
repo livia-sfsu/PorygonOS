@@ -22,9 +22,9 @@ void __printc(char chr, int format);
 void _cscreen() {
     char *vidMem = (char*) VIDEO_MEMORY;
     int sSize = SCREEN_WIDTH * SCREEN_HEIGHT;
-    int i = 0;
+    int i;
 
-    for (i; i < sSize; i++) {
+    for (i = 0; i < sSize; i++) {
         vidMem[i * 2] = 0;
         vidMem[i * 2 + 1] = STD_TEXT;
     }
@@ -156,7 +156,7 @@ void __printc(char chr, int format) {
         for (i = 1; i < SCREEN_HEIGHT; i++) {
             currOffset = (uint32_t) vidMem + i * SCREEN_WIDTH * 2;
             prevOffset = (uint32_t) vidMem + (i - 1) * SCREEN_WIDTH * 2;
-            memory_copy((char*) currOffset, (char*) prevOffset, SCREEN_WIDTH * 2);
+            memory_copy((unsigned char*) currOffset, (unsigned char*) prevOffset, SCREEN_WIDTH * 2);
         }
 
         // Erase the last row

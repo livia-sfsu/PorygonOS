@@ -6,7 +6,6 @@
 #include "../libc/function.h"
 #include "../kernel/kernel.h"
 #include "keyboard/keys.h" // flags for keyboard
-#include <stdint.h>
 
 #define BACKSPACE 0x0E
 #define ENTER 0x1C
@@ -30,7 +29,7 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6',
         'u', 'i', 'o', 'p', '[', ']', '?', '?', 'a', 's', 'd', 'f', 'g', 
         'h', 'j', 'k', 'l', ';', '\'', '#', '?', '\\', 'z', 'x', 'c', 'v', 
         'b', 'n', 'm', ',', '.', '/', '?', '?', '?', ' '};
-const char sc_uppercase[] = { '?', '?', '!', '"', '£', '$', '%', '^',     
+const char sc_uppercase[] = { '?', '?', '!', '@', '#', '$', '%', '^',     
     '&', '*', '(', ')', '_', '+', '?', '?', 'Q', 'W', 'E', 'R', 'T', 'Y', 
         'U', 'I', 'O', 'P', '{', '}', '?', '?', 'A', 'S', 'D', 'F', 'G', 
         'H', 'J', 'K', 'L', ':', '@', '~', '?', '|', 'Z', 'X', 'C', 'V', 
