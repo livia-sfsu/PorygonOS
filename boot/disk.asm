@@ -29,11 +29,12 @@ disk_load:
 
 disk_error:
     mov bx, DISK_ERROR
-    call print
-    call print_nl
+    call print;Should never print this
+    call print_nl;Feel like we can clean this up and delete
     mov dh, ah ; ah = error code, dl = disk drive that dropped the error
     call print_hex ; check out the code at http://stanislavs.org/helppc/int_13-1.html
     jmp disk_loop
+
 
 sectors_error:
     mov bx, SECTORS_ERROR
