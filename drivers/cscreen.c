@@ -16,7 +16,7 @@
 #define REG_SCREEN_CTRL 0x3d4
 #define REG_SCREEN_DATA 0x3d5
 
-void __printc(char chr, int format);
+void __printc(const char chr, int format);
 
 // Clears the screen and resets cursor
 void _cscreen() {
@@ -47,22 +47,22 @@ void _ccscreen(int format) {
 }
 
 // Prints a character to the screen in the specified format
-void _printcc(char chr, int formats) {
+void _printcc(const char chr, int formats) {
     __printc(chr, formats);
 }
 
 // Prints a character to the screen in standard format
-void _printc(char chr) {
+void _printc(const char chr) {
     __printc(chr, STD_TEXT);
 }
 
 // Prints a character to the screen in standard error format
-void _printec(char chr) {
+void _printec(const char chr) {
     __printc(chr, STD_ERR);
 }
 
 // Prints a string to the screen in the specified format
-void _printcs(char *str, int formats) {
+void _printcs(const char *str, int formats) {
     int i = 0;
 
     while (str[i]) {
@@ -71,7 +71,7 @@ void _printcs(char *str, int formats) {
 }
 
 // Prints a string to the screen in standard format
-void _prints(char *str) {
+void _prints(const char *str) {
     int i = 0;
 
     while (str[i]) {
@@ -80,7 +80,7 @@ void _prints(char *str) {
 }
 
 // Prints a string to the screen in standard error format
-void _printes(char *str) {
+void _printes(const char *str) {
     int i = 0;
 
     while (str[i]) {
@@ -167,7 +167,7 @@ int _getcolpos() {
 // internal functions
 
 // Prints a character to the screen in a specified format
-void __printc(char chr, int format) {
+void __printc(const char chr, int format) {
     char *vidMem = (char*) VIDEO_MEMORY;
     int offset = _getcpos();
     int maxOffset = SCREEN_HEIGHT * SCREEN_WIDTH * 2;
