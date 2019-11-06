@@ -8,12 +8,15 @@
 
 #endif
 
+typedef uint32_t uint_t;
+typedef uint32_t size_t;
+
 
 //G: Because I come from Java
-typedef enum{
+/*typedef enum{
 	false=0,
 	true=1
-} bool;
+} bool; */
 
 //Needed
 //a pointer to a location in memory

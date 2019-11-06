@@ -1,7 +1,7 @@
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c memory/*.c libc/*.c)
 HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h memory/*.h libc/*.h)
 # Nice syntax for file extension replacement
-OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o} 
+OBJ = ${C_SOURCES:.c=.o cpu/interrupts.o} 
 
 # Change this if your cross-compiler is somewhere else
 CC = gcc
@@ -17,12 +17,15 @@ os-image.bin: boot/bootsect.bin kernel.bin
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
-kernel.bin: kernel_entry.o paging_util.o ${OBJ}
+kernel.bin: kernel_entry.o interrupts.o paging_util.o ${OBJ}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
 
 kernel_entry.o: boot/kernel_entry.asm
 	#compile the kernel entry point but dont link, we need the contents of kernel.c
 	nasm boot/kernel_entry.asm -f elf -o kernel_entry.o
+
+interrupts.o: cpu/interrupts.asm
+	nasm cpu/interrupts.asm -f elf -o interrupts.o	
 
 paging_util.o: memory/paging_util.asm
 	nasm memory/paging_util.asm -f elf -o paging_util.o

@@ -1,5 +1,6 @@
 #define _SCREEN_H
 
+
 // Functions for interacting with the screen directly
 // This lists only the public functions
 
@@ -15,3 +16,5 @@ void _setcpos(int offset);
 int _getcpos();
 int _getrowpos();
 int _getcolpos();
+
+
