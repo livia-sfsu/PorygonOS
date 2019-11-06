@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../cpu/type.h"
 
 typedef struct PAGE_FRAME_DESCRIPTOR PAGE_FRAME_DESCRIPTOR;

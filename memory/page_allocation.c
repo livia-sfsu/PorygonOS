@@ -27,11 +27,11 @@ int liballoc_unlock(){
 
 //TODO IMPLEMENT
 void* liballoc_alloc(int pages){
-	//return heap_alloc_page_frames(pages);
+	return heap_alloc_page_frames(pages);
 }
 //TODO IMPLEME
 void liballoc_free(void* start, int pages){
-	//heap_free_page_frames(start, pages);
+	heap_free_page_frames(start, pages);
 }
 
 void lock(basic_lock* l){

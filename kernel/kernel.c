@@ -4,10 +4,14 @@
 #include "../libc/mem.h"
 #include "../drivers/cscreen.h"
 #include <stdint.h>
+#include "../memory/paging.h"
+#include "../memory/heap.h"
+#include "../memory/memory.h"
 
 void kernel_main() {
 	interrupts_disable();
 	interrupts_init();
+	paging_init();
     // isr_install();
     // irq_install();
 

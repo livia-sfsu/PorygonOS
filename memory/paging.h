@@ -1,5 +1,8 @@
 #pragma once
 
+#define assert(condition) ;
+#define halt() for(;;);
+
 /*
  * Initialize the virtual memory system and enable it
  */
