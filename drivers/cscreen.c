@@ -16,15 +16,15 @@
 #define REG_SCREEN_CTRL 0x3d4
 #define REG_SCREEN_DATA 0x3d5
 
-void __printc(char chr, int format);
+void __printc(const char chr, int format);
 
 // Clears the screen and resets cursor
 void _cscreen() {
     char *vidMem = (char*) VIDEO_MEMORY;
     int sSize = SCREEN_WIDTH * SCREEN_HEIGHT;
-    int i = 0;
+    int i;
 
-    for (i; i < sSize; i++) {
+    for (i = 0; i < sSize; i++) {
         vidMem[i * 2] = 0;
         vidMem[i * 2 + 1] = STD_TEXT;
     }
@@ -32,18 +32,46 @@ void _cscreen() {
     _setcpos(0);
 }
 
+// Clears the screen with a custom colour
+void _ccscreen(int format) {
+    char *vidMem = (char*) VIDEO_MEMORY;
+    int sSize = SCREEN_WIDTH * SCREEN_HEIGHT;
+    int i = 0;
+
+    for (i; i < sSize; i++) {
+        vidMem[i * 2] = ' ';
+        vidMem[i * 2 + 1] = format;
+    }
+    
+    _setcpos(0);
+}
+
+// Prints a character to the screen in the specified format
+void _printcc(const char chr, int formats) {
+    __printc(chr, formats);
+}
+
 // Prints a character to the screen in standard format
-void _printc(char chr) {
+void _printc(const char chr) {
     __printc(chr, STD_TEXT);
 }
 
 // Prints a character to the screen in standard error format
-void _printec(char chr) {
+void _printec(const char chr) {
     __printc(chr, STD_ERR);
 }
 
+// Prints a string to the screen in the specified format
+void _printcs(const char *str, int formats) {
+    int i = 0;
+
+    while (str[i]) {
+        __printc(str[i++], formats);
+    }
+}
+
 // Prints a string to the screen in standard format
-void _prints(char *str) {
+void _prints(const char *str) {
     int i = 0;
 
     while (str[i]) {
@@ -52,7 +80,7 @@ void _prints(char *str) {
 }
 
 // Prints a string to the screen in standard error format
-void _printes(char *str) {
+void _printes(const char *str) {
     int i = 0;
 
     while (str[i]) {
@@ -65,15 +93,20 @@ void _printbks() {
     int offset = _getcpos();
     offset -= 2;
 
-    char *vidMem = (char*) VIDEO_MEMORY;
-    vidMem[offset] = 0;
-    vidMem[offset + 1] = STD_TEXT;
+    // Check to make sure we don't write outside of memory
+    if (offset >= 0) {
+        char *vidMem = (char*) VIDEO_MEMORY;
+        vidMem[offset] = 0;
+        vidMem[offset + 1] = STD_TEXT;
+    }
 
     _setcpos(offset);
 }
 
 // Turns the flashing cursor on
 void _onc() {
+    // We want to blink pixel lines 14-15 (the lower 2)
+
     // lower cursor shape
     port_byte_out(REG_SCREEN_CTRL, 0x0a);
     // turn it on
@@ -88,6 +121,12 @@ void _onc() {
 void _offc() {
     port_byte_out(REG_SCREEN_CTRL, 0x0a);
     port_byte_out(REG_SCREEN_DATA, 0x20);
+}
+
+// Sets the cursor position
+void _setcposx(int x, int y) {
+    int offset = y * SCREEN_WIDTH + x;
+    _setcpos(offset * 2);
 }
 
 // Sets the cursor position, accounting for 2-byte cells
@@ -128,7 +167,7 @@ int _getcolpos() {
 // internal functions
 
 // Prints a character to the screen in a specified format
-void __printc(char chr, int format) {
+void __printc(const char chr, int format) {
     char *vidMem = (char*) VIDEO_MEMORY;
     int offset = _getcpos();
     int maxOffset = SCREEN_HEIGHT * SCREEN_WIDTH * 2;
@@ -156,7 +195,7 @@ void __printc(char chr, int format) {
         for (i = 1; i < SCREEN_HEIGHT; i++) {
             currOffset = (uint32_t) vidMem + i * SCREEN_WIDTH * 2;
             prevOffset = (uint32_t) vidMem + (i - 1) * SCREEN_WIDTH * 2;
-            memory_copy((char*) currOffset, (char*) prevOffset, SCREEN_WIDTH * 2);
+            memory_copy((unsigned char*) currOffset, (unsigned char*) prevOffset, SCREEN_WIDTH * 2);
         }
 
         // Erase the last row

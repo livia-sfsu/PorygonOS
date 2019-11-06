@@ -1,10 +1,10 @@
-#ifndef STRINGS_H
-#define STRINGS_H
+#ifndef STRING_H
+#define STRING_H
 
 void int_to_ascii(int n, char str[]);
 void hex_to_ascii(int n, char str[]);
 void reverse(char s[]);
-int strlen(char s[]);
+int strlen(const char s[]);
 int backspace(char s[]);
 void append(char s[], char n);
 int strcmp(const char s1[], const char s2[]);
@@ -13,5 +13,5 @@ char *strcat(char dest[], const char source[]);
 char *strncat(char dest[], const char source[], int n);
 char *strcpy(char dest[], const char source[]);
 char *strncpy(char dest[], const char source[], int n);
-
+char *strtok(char str[], const char delim[]);
 #endif
