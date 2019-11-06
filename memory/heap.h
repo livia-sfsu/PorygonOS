@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../kernel/types.h"
+#include "../cpu/type.h"
 
 typedef struct PAGE_FRAME_DESCRIPTOR PAGE_FRAME_DESCRIPTOR;
 
 struct PAGE_FRAME_DESCRIPTOR{
-	bool is_in_use;
+	int is_in_use;
 	void* frame;
 };
 
