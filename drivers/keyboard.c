@@ -6,6 +6,7 @@
 #include "../libc/function.h"
 #include "../kernel/kernel.h"
 #include "keyboard/keys.h" // flags for keyboard
+#include <stdint.h>
 
 #define BACKSPACE 0x0E
 #define ENTER 0x1C
@@ -18,6 +19,8 @@
 static char key_buffer[256];
 
 #define SC_MAX 57
+void processKeypress(uint8_t scancode);
+
 const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6", 
     "7", "8", "9", "0", "-", "=", "Backspace", "Tab", "Q", "W", "E", 
         "R", "T", "Y", "U", "I", "O", "P", "[", "]", "Enter", "Lctrl", 
