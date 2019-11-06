@@ -163,3 +163,31 @@ char *strncpy(char dest[], const char source[], int n) {
 
     return dest;
 }
+
+char *strtok(char *str, const char *delim) {
+    static char *saved;         // if NULL is passed this will be used instead
+    char *endpt;
+    const char *d;
+
+    if (!str) { str = saved; }          // if NULL is passed use saved string
+    if (!delim) {                           // if no delimiters
+        saved = 0;                          // reset saved string
+        return str;                         // return passed string
+    }
+
+    // advance through string until null terminator is found
+    for (endpt = str; *endpt; endpt++) {
+        // advance through all delimiters
+        for (d = delim; *d; d++) {
+            if (*endpt == *d) {     // if character is one of the delimiters
+                *endpt = '\0';      // replace character with null terminator
+                // save the address of the next character in the string
+                saved = endpt + 1;
+                return str;                 // return the string
+            }
+        }
+    }
+    // if end of string has been reached
+    saved = 0;
+    return str;
+}

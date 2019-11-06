@@ -13,5 +13,5 @@ char *strcat(char dest[], const char source[]);
 char *strncat(char dest[], const char source[], int n);
 char *strcpy(char dest[], const char source[]);
 char *strncpy(char dest[], const char source[], int n);
-
+char *strtok(char str[], const char delim[]);
 #endif
