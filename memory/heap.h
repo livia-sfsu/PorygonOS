@@ -1,5 +1,10 @@
 #include "../cpu/type.h"
 
+//what is going on: we are creating two memory managers: 
+//1) which can manage the virtual address space for user applications
+//2)one which implements malloc()
+//3)Note this is
+
 typedef struct PAGE_FRAME_DESCRIPTOR PAGE_FRAME_DESCRIPTOR;
 
 struct PAGE_FRAME_DESCRIPTOR{
@@ -41,5 +46,5 @@ uint32_t heap_get_metadata_size();
  * The size of a page frame
  */
 #ifndef PAGE_SIZE_BYTES
-	#define PAGE_SIZE_BYTES 4096
+	#define PAGE_SIZE_BYTES 4096 //512 word
 #endif

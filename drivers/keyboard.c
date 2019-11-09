@@ -18,7 +18,9 @@
 
 static char key_buffer[256];
 
-#define UNUSED(x) (void)(x) //Used for eliminating compiler errors
+//Don't need
+//Just include funtion.h
+//#define UNUSED(x) (void)(x) //Used for eliminating compiler errors
 
 #define SC_MAX 57
 const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6", 

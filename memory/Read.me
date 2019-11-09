@@ -1,12 +1,15 @@
 MUSTRead.me
 
+//TODO add some info about the MMU
+
+
 After exploring this for a long time.
 I realized there there needs to be a decent of background understanding
 if you are to understand the code in this folder.
 
 Some basic things you must know
 1)Control Registers(See below)
-2)
+2)How Page Directory and Page tables are connected
 
 
 Bible : 
@@ -32,8 +35,17 @@ Todo:
 
 CONTROL REGISTERS:
 A control register is a processor register which changes or controls the general behavior of a CPU or other digital device. Common tasks performed by control registers include interrupt control, switching the addressing mode, paging control, and coprocessor control.(WIKI)
+	1)The upper 20 bits of CR3 become the page directory base register, which stores the physical address of the first page directory entry.
+	2)
+	3)
 
 
+BAGE DIRECTORY:
+The i386 uses a three-level translation scheme: the PDBR (Page Directory Base Register, called by CR3) contains the physical address of a page directory. The page directory is a page in memory split into 1,024 32-bit words, or Page Directory Entries, each of which is the physical address of a page table. Each page table is, too, split into 1,024 Page Table Entries. each of these words is the physical address of a page in memory.
 
+So think of Page Directory->Page table Entries->Page(Page=Your actual data)
+
+IMPORTANT FOR UNDERSTANDING PAGING CODE:
+The page directory base register, page directory and page table entry need 20 bits each, so the bottom 12 bits are used as flags. These flags can apply protection (read/write and user vs. supervisor) to pages and page tables, and they can mark individual pages and page tables as present or not present. There is also an 'accessed' flag, which the processor sets when a page or page table is accessed. By switching the page directory base register you can use different page directories and page tables in different contexts, thereby causing separate applications to use different address spaces.
 
 
