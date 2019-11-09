@@ -176,9 +176,9 @@ char *strtok(char *str, const char *delim) {
     }
 
     // advance through string until null terminator is found
-    for (endpt = str; *endpt; endpt++) {
+    for (endpt = str; *endpt != 0; endpt++) {
         // advance through all delimiters
-        for (d = delim; *d; d++) {
+        for (d = delim; *d != 0; d++) {
             if (*endpt == *d) {     // if character is one of the delimiters
                 *endpt = '\0';      // replace character with null terminator
                 // save the address of the next character in the string
