@@ -16,8 +16,9 @@ To Keep people up to speed:
 
 TODO:
 1)Set up a kernelDirectory strcut for all page table, so it has its own page table and every page table has that struct that points back to it.
-2)Get the keyboard to acccess the proper interrupt for use
-3)Clearer organization of memlayout.h
+2)Get a different Branch for clean code for a easy merge.
+3)Get the keyboard to acccess the proper interrupt for use
+4)Clearer organization of memlayout.h
 
 
 
