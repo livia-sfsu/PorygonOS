@@ -18,6 +18,8 @@
 
 static char key_buffer[256];
 
+#define UNUSED(x) (void)(x) //Used for eliminating compiler errors
+
 #define SC_MAX 57
 const char *sc_name[] = { "ERROR", "Esc", "1", "2", "3", "4", "5", "6", 
     "7", "8", "9", "0", "-", "=", "Backspace", "Tab", "Q", "W", "E", 
@@ -31,12 +33,12 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6',
         'h', 'j', 'k', 'l', ';', '\'', '#', '?', '\\', 'z', 'x', 'c', 'v', 
         'b', 'n', 'm', ',', '.', '/', '?', '?', '?', ' '};
 
-//Giving me an error
-// const char sc_uppercase[] = { '?', '?', '!', '"', '£', '$', '%', '^',     
-//     '&', '*', '(', ')', '_', '+', '?', '?', 'Q', 'W', 'E', 'R', 'T', 'Y', 
-//         'U', 'I', 'O', 'P', '{', '}', '?', '?', 'A', 'S', 'D', 'F', 'G', 
-//         'H', 'J', 'K', 'L', ':', '@', '~', '?', '|', 'Z', 'X', 'C', 'V', 
-//         'B', 'N', 'M', '<', '>', '?', '?', '?', '?', ' '};
+
+const char sc_uppercase[] = { '?', '?', '!', '"', '£', '$', '%', '^',     
+    '&', '*', '(', ')', '_', '+', '?', '?', 'Q', 'W', 'E', 'R', 'T', 'Y', 
+        'U', 'I', 'O', 'P', '{', '}', '?', '?', 'A', 'S', 'D', 'F', 'G', 
+        'H', 'J', 'K', 'L', ':', '@', '~', '?', '|', 'Z', 'X', 'C', 'V', 
+        'B', 'N', 'M', '<', '>', '?', '?', '?', '?', ' '};
 
 static void keyboard_callback(interrupt_data_s* r) {
     /* The PIC leaves us the scancode in port 0x60 */
@@ -71,12 +73,18 @@ static void keyboard_callback(interrupt_data_s* r) {
         }
     }
 
-   // UNUSED(regs); Just being lazy error=comment out
+    //I am note sure why unused is giving me an error
+    //I thought I had the proper function void declartation(void)
+  // UNUSED(regs); 
+
     return;
 }
 
+//Wait why is this not working properly?
+//Who is call it?
+//When does keyboard get initialized?
 void processKeypress(uint8_t scancode) {
-    /* Does not get executed! */
+    
     if (scancode > SC_MAX) return;
     if (scancode == BACKSPACE) {
         int len = backspace(key_buffer);
@@ -84,13 +92,13 @@ void processKeypress(uint8_t scancode) {
             _printbks();
     } else if (scancode == ENTER) {
         _prints("\n");
-        //user_input(key_buffer); /* kernel-controlled function */
+        user_input(key_buffer); /* kernel-controlled function */
         key_buffer[0] = '\0';
     } else {
         char letter;
-		//I don't feel like debugging at the moment.
-        if (/*kflags.caps || */kflags.lshift || kflags.rshift) {
-            //letter = sc_uppercase[(int)scancode];
+		
+        if (kflags.caps || kflags.lshift || kflags.rshift) {
+            letter = sc_uppercase[(int)scancode];
         } else
             letter = sc_ascii[(int)scancode];
         /* Remember that kprint only accepts char[] */

@@ -171,6 +171,8 @@ void interrupt_handler(interrupt_data_s* r)
 	};
 
 	uint_t num_exceptions_known = sizeof(exception_messages) / sizeof(const char *);
+	//if(callbacks[r->int_no]=1){
+	//_prints("\n KeyBoard  num caught");}
 
 	if(callbacks[r->int_no] != 0){
 		__asm__ __volatile__("nop" : : : "%ecx");
