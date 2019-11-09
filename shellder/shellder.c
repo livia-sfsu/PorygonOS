@@ -68,7 +68,7 @@ char** shdr_parse(char* line) {
     char* token;
     int pos = 0;
     
-    kmalloc(DEFAULT_BUFF * sizeof(char*), 1, (uint32_t*)tokens); // TODO: find out why this is broken
+    kmalloc(DEFAULT_BUFF * sizeof(char*), 1, (uint32_t*)tokens); // TODO: Replace with an malloc ASAP
     token = strtok(line, " ");
     while (token != 0) {            // we don't have NULL yet
         tokens[pos] = token;
@@ -87,5 +87,5 @@ void shdr_exec(char** tokens) {
         _prints(*tokens);
         _prints("\n");
     }   
-    _prints("\n shdr > ");
+    _prints("\n{shdr}> ");
 }

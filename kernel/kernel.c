@@ -14,7 +14,7 @@ void kernel_main() {
     asm("int $3");
 
     _cscreen();
-    _prints(" shdr > ");
+    _prints("{shdr}> ");
 }
 
 //*
