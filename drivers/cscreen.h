@@ -1,3 +1,4 @@
+#ifndef _SCREEN_H
 #define _SCREEN_H
 
 // Functions for interacting with the screen directly
@@ -19,3 +20,6 @@ void _setcposx(int x, int y);
 int _getcpos();
 int _getrowpos();
 int _getcolpos();
+
+#endif
+

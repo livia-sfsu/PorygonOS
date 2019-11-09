@@ -4,6 +4,7 @@
 #include "../libc/mem.h"
 #include "../drivers/cscreen.h"
 #include <stdint.h>
+#include "../shellder/shellder.h"
 
 void kernel_main() {
     isr_install();
@@ -13,16 +14,22 @@ void kernel_main() {
     asm("int $3");
 
     _cscreen();
-    _prints("Type something, it will go through the kernel\n"
-        "Type END to halt the CPU or PAGE to request a kmalloc()\n> ");
+    _prints(" shdr > ");
 }
 
+//*
+void user_input(char *input) {
+    text_buffer = input;     // text_buffer is declared in kernel.h
+    shellder();
+}
+//*/
+/*
 void user_input(char *input) {
     if (strcmp(input, "END") == 0) {
         _prints("Stopping the CPU. Bye!\n");
         asm volatile("hlt");
     } else if (strcmp(input, "PAGE") == 0) {
-        /* Lesson 22: Code to test kmalloc, the rest is unchanged */
+        // Lesson 22: Code to test kmalloc, the rest is unchanged //
         uint32_t phys_addr;
         uint32_t page = kmalloc(1000, 1, &phys_addr);
         char page_str[16] = "";
@@ -39,3 +46,5 @@ void user_input(char *input) {
     _prints(input);
     _prints("\n> ");
 }
+*/
+
