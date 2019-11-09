@@ -26,6 +26,8 @@ void heap_init_page_frame_heap(void* init_heap, uint_t init_heap_size){
 	}
 }
 
+
+
 void* heap_alloc_page_frames(int frame_count){
 	uint_t first_frame_in_sequence_index = -1;
 	uint_t frames_found = 0;
@@ -59,6 +61,7 @@ void* heap_alloc_page_frames(int frame_count){
 	}
 }
 
+//Looking for HeapPage Frames to print on
 void heap_free_page_frames(void* start, int frame_count){
 	for(uint_t i = 0; i < _page_frame_count; i++){
 		if(frame_count == 0){

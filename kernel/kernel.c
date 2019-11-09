@@ -25,13 +25,15 @@ void kernel_main() {
 	interrupts_init();
 
 	paging_init();
-	_prints("Post post paging");
+	_prints("Post post paging\n");
+	
+	
+	void keyboard_init();
+	
+	_prints("\n Are we getting past KeyBoard Init?");
+	_prints("\n Pre Interrupts_init");
 	interrupts_init();
 	_prints("\n Post Interrupts_init");
-	void keyboard_init();
-	_prints("\n Are we getting past KeyBoard Init?");
-
-
     // isr_install();
     // irq_install();
 
@@ -39,7 +41,7 @@ void kernel_main() {
      asm("int $3");
 
      //_cscreen();
-     _prints("Type something, it will go through the kernel\n");}
+     _prints("\nType something, it will go through the kernel\n");}
 
 void user_input(char *input) {
     if (strcmp(input, "END") == 0) {

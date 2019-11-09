@@ -3,6 +3,15 @@
 #include "memory.h"
 //Boiler plate code
 
+//Reason why there is a lock system here:
+//If an I/O controller (like the keyboard) is doing direct-memory access,
+// it would be wrong to change pages in the middle of the I/O operation.
+//Also
+//There are things that the kernel may want to do, but 
+//cannot tolerate having their pages swapped out. 
+//What is here will be slow,
+//And needs to be revised for a better system later.
+
 //Check out http://www.jamesmolloy.co.uk/tutorial_html/6.-Paging.html
 //I followed him pretty literally
 //Went to a few other tutorials but they just did varations of what he did.
@@ -10,6 +19,7 @@
 
 //Todo
 //All of this lock stuff needs to be abstracted out
+//Can be used for context swiching later.
 typedef int basic_lock;
 
 basic_lock allocator_lock;
@@ -29,7 +39,7 @@ int liballoc_unlock(){
 void* liballoc_alloc(int pages){
 	return heap_alloc_page_frames(pages);
 }
-//TODO IMPLEME
+//TODO IMPLEMENT
 void liballoc_free(void* start, int pages){
 	heap_free_page_frames(start, pages);
 }
