@@ -1,22 +1,23 @@
 ; This is the bootsector
 ; It is FAT16
 
-[org 0x7c00]
+; [org 0x7c00]
 
+; Skip past BPB, EBPB
 _start:
     jmp short boot
     nop
-
+   
 bsOemName       db "POS     " ; OEM label
 bsBytesPerSec   dw 0x200      ; bytes per sec
 bsNumSecs       db 1          ; 1 sector per cluster - simplicity
 bsNumResSecs    dw 1          ; num of reserved sectors
 bsNumFAT        db 2          ; num of fat copies
-bsNumDirEntries dw 224        ; size of root dir
-bsTotalSectors  dw 2880       ; total num secs
+bsNumDirEntries dw 16        ; size of root dir
+bsTotalSectors  dw 250       ; total num secs
 bsMediaDesc     db 0xF0       ; media descriptor
-bsSectorsFAT    dw 9          ; num of secs per fat
-bsSectorsTrack  dw 18          ; sectors per track
+bsSectorsFAT    dw 4          ; num of secs per fat
+bsSectorsTrack  dw 1          ; sectors per track
 bsHeads         dw 2          ; num of rw heads
 bsHiddenSecs    dd 0          ; num of hidden secs
 bsLargeSec      dd 0          ; num of > 32mb secs
@@ -34,125 +35,111 @@ times 0x3B db 0 ; code starts at 0x3E
 ; Begin boot code
 
 boot:
-   mov [bsDriveNum], dl   ; BIOS passes drive number in DL
+   mov [bsDriveNum], dl ; obtain drive number
+   ; Initialise registers
    xor eax, eax
-   xor esi, esi
-   xor edi, edi
+   mov esi, eax
+   mov edi, eax
+
    mov ds, ax
    mov es, ax
-   mov bp, 0x7c00
-
-; read in the root cluster
-; check for the filename
-; if found save the starting cluster
-; if not then error
-
-;fatstart = bsResSectors
-
-;rootcluster = bsResSectors + (bsFATs * bsSecsPerFat)
-; 4 + (2 * 254) = sector 512
-
-;datastart = bsResSectors + (bsFATs * bsSecsPerFat) + ((bsRootDirEnts * 32) / bsBytesPerSec)
-; 4 + (2 * 254) + ((512 * 32) / 512) = sector 544
-
-;cluster X starting sector
-; starting sector = (bsSecsPerClust * (cluster# - 2)) + datastart
+   mov bp, 0x7C00
 
 ff:
    mov ax, [bsSectorsFAT]
-   shl ax, 1   ; quick multiply by two
+   shl ax, 1 ; mult by 2
    add ax, [bsNumResSecs]
    mov [rootstart], ax
 
    mov bx, [bsNumDirEntries]
-   shr bx, 4   ; bx = (bx * 32) / 512
-   add bx, ax   ; BX now holds the datastart sector number
+   shr bx, 4 ; bx = (bx * 32) / 512
+   add bx, ax ; bx is now datastart sector num
    mov [datastart], bx
-   
+
 ff_next_sector:
    mov bx, 0x8000
    mov si, bx
    mov di, bx
    call readsector
 
-; Search for file name, and find start cluster.
+; search for filename, start cluster
 ff_next_entry:
    mov cx, 11
    mov si, filename
    repe cmpsb
-   jz ff_done      ; note that di now is at dirent+11
+   jz ff_done ; di is now dirent+11
 
    add di, byte 0x20
    and di, byte -0x20
    cmp di, [bsBytesPerSec]
    jnz ff_next_entry
    ; load next sector
-   dec dx         ; next sector in cluster
+   dec dx ; next sec in cluster
    jnz ff_next_sector
 
 ff_done:
    add di, 15
-   mov ax, [di]   ; AX now holds the starting cluster #
+   mov ax, [di] ; ax now holds starting cluster num
 
-; At this point we have found the file we want and know the cluster where the file starts
+   ; we have now found the file we want and we know the cluster where it starts
+   mov bx, 0x8000
+   ; want to load 0x0000:0x8000
 
-   mov bx, 0x8000   ; We want to load to 0x0000:0x8000
-loadfile:   
+loadfile:
    call readcluster
-   cmp ax, 0xFFF8   ; Have we reached the end cluster marker?
-   jg loadfile   ; If not then load another
-   
+   cmp ax, 0xFFF8 ; have we reached the end cluster marker
+   jg loadfile ; if not, read another
+
+   mov ah, 0x0e
+   mov al, 'Y'
+   int 0x10
+   jmp $
    jmp 0x0000:0x8000
 
-   
-   
-;------------------------------------------------------------------------------
-; Read a sector from disk, using LBA
-; input:   EAX - 32-bit DOS sector number
-;      ES:BX - destination buffer
-; output:   ES:BX points one byte after the last byte read
-;      EAX - next sector
+; read a sector from the disk
 readsector:
    push dx
    push si
    push di
 
 read_it:
-   push eax   ; Save the sector number
-   mov di, sp   ; remember parameter block end
+   push eax ; save sec num
+   mov di, sp ; remember param block end
 
-   push byte 0   ; other half of the 32 bits at [C]
-   push byte 0   ; [C] sector number high 32bit
-   push eax   ; [8] sector number low 32bit
-   push es    ; [6] buffer segment
-   push bx    ; [4] buffer offset
-   push byte 1   ; [2] 1 sector (word)
-   push byte 16   ; [0] size of parameter block (word)
+   push byte 0 ; other half of 32 bits at [c]
+   push byte 0 ; [c] sec num high 32 bit
+
+   push eax ; [8] sec num low 32bit
+   push es ; [6] buff seg
+   push bx ; [4] buff offset
+   push byte 1 ; [2] 1 sector (word)
+   push byte 16 ; [0] size of param block (word)
 
    mov si, sp
    mov dl, [bsDriveNum]
-   mov ah, 42h   ; EXTENDED READ
-   int 0x13   ; http://hdebruijn.soo.dto.tudelft.nl/newpage/interupt/out-0700.htm#0651
+   mov ah, 42h ; extended read
+   int 0x13
 
-   mov sp, di   ; remove parameter block from stack
-   pop eax      ; Restore the sector number
+   mov sp, di ; remove param block from stack
+   pop eax
 
-   jnc read_ok    ; jump if no error
+   jnc read_ok ; jmp if no err
 
+   mov dx, ax
    push ax
-   xor ah, ah   ; else, reset and retry
+   xor ah, ah ; otherwise reset & retry
    int 0x13
    pop ax
    jmp read_it
 
 read_ok:
-   inc eax       ; next sector
-   add bx, 512      ; Add bytes per sector
-   jnc no_incr_es      ; if overflow...
+   inc eax ; next sec
+   add bx, 512 ; add bytes per sec
+   jnc no_incr_es ; if overflow
 
 incr_es:
    mov dx, es
-   add dh, 0x10      ; ...add 1000h to ES
+   add dh, 0x10 ; add 1000h to es
    mov es, dx
 
 no_incr_es:
@@ -160,76 +147,54 @@ no_incr_es:
    pop si
    pop dx
    ret
-;------------------------------------------------------------------------------
 
-
-;------------------------------------------------------------------------------
-; Read a cluster from disk, using LBA
-; input:   AX - 16-bit cluster number
-;      ES:BX - destination buffer
-; output:   ES:BX points one byte after the last byte read
-;      AX - next cluster
+; read a cluster from disk, using lba
 readcluster:
    push cx
-   mov [tcluster], ax      ; save our cluster value
-;cluster X starting sector
-; starting sector = (bsSecsPerClust * (cluster# - 2)) + datastart
+   mov [tcluster], ax ; save cluster val
+
+   ; cluster x starting sec
+   ; starting sec = (bssecsperclust * (cluster# - 2)) + datastart
    xor cx, cx
    sub ax, 2
    mov cl, byte [bsNumSecs]
-   imul cx      ; EAX now holds starting sector
-   add ax, word [datastart]   ; add the datastart offset
+   imul cx ; eax now holds start sec
+   add ax, word [datastart] ; add datastart offset
 
    xor cx, cx
-   mov cl, byte [bsNumSecs]
+   mov cl, byte[bsNumSecs]
 readcluster_nextsector:
    call readsector
    dec cx
    cmp cx, 0
    jne readcluster_nextsector
 
-; Great! We read a cluster.. now find out where the next cluster is
-   push bx   ; save our memory pointer
-   mov bx, 0x7E00   ; load a sector from the root cluster here
+; we just read a cluster
+; find out where the next one is
+   push bx ; save mem ptr
+   mov bx, 0x7E00 ; load sec from root cluster
    push bx
    mov ax, [bsNumResSecs]
    call readsector
-   pop bx   ; bx points to 0x7e00 again
-   mov ax, [tcluster] ; ax holds the cluster # we just read
-   shl ax, 1   ; multipy by 2
+   pop bx ; bx points to 0x7e00
+   mov ax, [tcluster] ; ax holds cluster # we just read
+   shl ax, 1 ; mult by 2
    add bx, ax
    mov ax, [bx]
-   
-   pop bx   ; restore our memory pointer
+
+   pop bx ; restore mem ptr
    pop cx
    
    ret
 
-print:
-    pusha
-print_start:
-    mov al, [bx]
-    cmp al, 0 ; will be zero if at end of string
-    je print_done
+filename db "PURE64  SYS", 0
+boot_msg: db 'Booting POS...', 0
+booted_msg: db "Successfully loaded BPB, EBPB", 0
 
-    mov ah, 0x0e
-    int 0x10 ; print char
-
-    add bx, 1
-    jmp print_start
-print_done:
-    popa
-    ret
-
-; declare some data!
-filename db "POS        ", 0
 datastart dw 0x0000
 rootstart dw 0x0000
 tcluster dw 0x0000
 
-boot_msg: db 'Booting POS...', 0
-booted_msg: db 'Successfully loaded BPB, EBPB', 0
-
 ; End boot code, pad with zeroes, begin boot sig
-times 510-$+$$ db 0
-sign dw 0xAA55
+times 510-($-$$) db 0
+dw 0xAA55
