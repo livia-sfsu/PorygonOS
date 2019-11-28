@@ -17,11 +17,11 @@ boot16.bin: boot/bootsect.asm
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+	ld -m elf_i386 -o $@ -Ttext 0x10000 $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ 
+	ld -m elf_i386 -o $@ -Ttext 0x10000 $^ 
 
 run: img
 	qemu-system-i386 -fda porygon.img
@@ -32,13 +32,13 @@ img: boot/secondstage.bin kernel.bin boot16.bin
 	mkdir -p bootdiskmnt
 
 	dd if=/dev/zero of=porygon.img bs=512 count=2880
-	mkfs -t fat porygon.img
+	mkfs.fat -F 12 porygon.img
 	echo "sudo is needed to mount disk"
-	sudo mount porygon.img bootdiskmnt
-	sudo cp boot/secondstage.bin bootdiskmnt/POS.SYS
-	sudo cp kernel.bin bootdiskmnt/KRN.SYS
+	-sudo mount porygon.img bootdiskmnt
+	-sudo cp boot/secondstage.bin bootdiskmnt/POS.SYS
+	-sudo cp kernel.bin bootdiskmnt/KRN.SYS
 	sleep 1
-	sudo umount bootdiskmnt
+	-sudo umount bootdiskmnt
 	dd if=boot16.bin of=porygon.img bs=512 count=1 seek=0 conv=notrunc
 	echo "porygon.img created, you may now run bochs"
 	

@@ -2,7 +2,7 @@
 ; It contaisn the BPB, EBPB and the boot code.
 ; It acts as a bootstrapper to then load the second-stage bootloader stored at POS.SYS
 
-;%define ISFAT12         1              ; only 1 of these should be set,
+%define ISFAT12         1              ; only 1 of these should be set,
 ;%define ISFAT16         1              ; defines which FAT is supported
 
 %define TRYLBAREAD       1              ; undefine to use only CHS int 13h
