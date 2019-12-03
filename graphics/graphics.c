@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "graphics.h"
 #ifndef _SCREEN_H
 #include "../drivers/cscreen.h"
