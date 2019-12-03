@@ -4,3 +4,4 @@
 *.img
 bochsout.txt
 parport.out
+.idea/*

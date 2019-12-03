@@ -5,6 +5,7 @@
 #include "../libc/string.h"
 #include "timer.h"
 #include "ports.h"
+#include "../drivers/fs/fat12.h"
 
 isr_t interrupt_handlers[256];
 
@@ -150,4 +151,6 @@ void irq_install() {
     init_timer(50);
     /* IRQ1: keyboard */
     init_keyboard();
+    /* IRQ6: disk */
+    init_disk();
 }
