@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c graphics/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h graphics/*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c graphics/*.c disk/*.c drivers/fs/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h graphics/*.h disk/*.h drivers/fs/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o} 
 
@@ -11,26 +11,35 @@ GDB = i386 gdb
 # We add -fno-pie
 CFLAGS = -fno-pie -g -ffreestanding -Wall -Wextra -fno-exceptions -m32
 
-# First rule is run by default
-os-image.bin: boot/bootsect.bin kernel.bin
-	cat $^ > os-image.bin
+boot16.bin: boot/bootsect.asm
+	nasm $^ -f bin -o $@
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+	ld -m elf_i386 -o $@ -Ttext 0x10000 $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ 
+	ld -m elf_i386 -o $@ -Ttext 0x10000 $^ 
 
-run: os-image.bin
-	qemu-system-i386 -fda os-image.bin
+run: img
+	qemu-system-i386 -fda porygon.img
 
 # pad the binary to 512 bytes
-img: os-image.bin
-	dd if=/dev/zero bs=1024 count=128 of=porygon.img
-	dd if=os-image.bin of=porygon.img conv=notrunc
+img: boot/secondstage.bin kernel.bin boot16.bin
+	# Make sure the mounting dir exists
+	mkdir -p bootdiskmnt
+
+	dd if=/dev/zero of=porygon.img bs=512 count=2880
+	mkfs.fat -F 12 porygon.img
+	echo "sudo is needed to mount disk"
+	-sudo mount porygon.img bootdiskmnt
+	-sudo cp boot/secondstage.bin bootdiskmnt/POS.SYS
+	-sudo cp kernel.bin bootdiskmnt/KRN.SYS
+	sleep 1
+	-sudo umount bootdiskmnt
+	dd if=boot16.bin of=porygon.img bs=512 count=1 seek=0 conv=notrunc
 	echo "porygon.img created, you may now run bochs"
 	
 bochs: img
@@ -54,4 +63,4 @@ debug: os-image.bin kernel.elf
 
 clean:
 	rm -rf *.bin *.dis *.o os-image.bin *.elf *.img
-	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o cpu/*.o libc/*.o graphics/*.o
+	rm -rf kernel/*.o boot/*.bin boot/*.img drivers/*.o boot/*.o cpu/*.o libc/*.o graphics/*.o
