@@ -35,7 +35,7 @@ void write_floppy_cmd(int base, char cmd)
     for (i = 0; i < 600; i++) {
         // TODO: sleep here 10ms
         if (0x80 & port_byte_in(base + FLOPPY_MSR)) {
-            return (void) out8_p(base + FLOPPY_FIFO, cmd);
+            return (void) port_byte_out(base + FLOPPY_FIFO, cmd);
         }
     }
 
